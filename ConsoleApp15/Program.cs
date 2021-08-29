@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using ConsoleApp15;
 using Dapper;
 using Npgsql;
 
-namespace ConsoleApp15
+namespace Message
 {
     class Program
     {
@@ -17,31 +18,31 @@ namespace ConsoleApp15
             {
                 Console.WriteLine("Введите имя");
 
-                string UserName = Console.ReadLine();
-                while (string.IsNullOrEmpty(UserName))
+                string userName = Console.ReadLine();
+                while (string.IsNullOrEmpty(userName))
                 {
-                        Console.WriteLine("Недопустимое имя");
-                        UserName = Console.ReadLine();
+                    Console.WriteLine("Недопустимое имя");
+                    userName = Console.ReadLine();
                 }
-                User user = new(UserName);
+                User user = new(userName);
                 Console.WriteLine("Введите сообщение");
-                List<Friend> message = connection.Query<Friend>("SELECT * FROM \"Messages\"").ToList();
-                UpdatTimer tm = new UpdatTimer(message);
-                Timer timer = new Timer(tm.TimerChat, null, 1, 5000);
+                Console.WriteLine("Для закрытия чата пропишите <Закрыть чат>");
+                UpdatTimer tm = new UpdatTimer();
+                
                 while (true)
                 {
-                    if (true)
-                    {
-                        string Message = Console.ReadLine();
-                        connection.Query($"Insert into \"Messages\" (\"Name\", \"Message\", \"Time\") values ('{user.Name}', '{Message}', '{DateTime.UtcNow.ToString("MM/dd/yyyy HH:mm")}')");
-                        while (string.IsNullOrEmpty(Message))
+                        string messages = Console.ReadLine();
+                        if (string.IsNullOrEmpty(messages))
                         {
                             Console.WriteLine("Пустое сообщение");
-                            Message = Console.ReadLine();
+                            messages = Console.ReadLine();
                         }
+                        if (messages == "Закрыть чат")
+                    {
+                        Environment.Exit(0);
                     }
+                    connection.Query($"Insert into \"Messages\" (\"Name\", \"Message\", \"Time\") values ('{user.Name}', '{messages}', '{DateTime.UtcNow.ToString("MM/dd/yyyy HH:mm")}')");
                 }
-
             }
             finally
             {
